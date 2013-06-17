@@ -11,13 +11,10 @@ Bundle 'JofArnold/ir_black2'
 Bundle 'tpope/vim-fugitive'
 Bundle 'tpope/vim-git'
 Bundle 'pangloss/vim-javascript'
-Bundle 'scrooloose/nerdtree'
 Bundle 'scrooloose/nerdcommenter'
 Bundle 'tpope/vim-surround'
 Bundle 'vim-scripts/taglist.vim'
-
 Bundle 'SirVer/ultisnips'
-
 Bundle 'tpope/vim-markdown'
 Bundle 'godlygeek/tabular'
 Bundle 'tpope/vim-unimpaired'
@@ -29,12 +26,11 @@ Bundle 'juvenn/mustache.vim'
 Bundle 'slim-template/vim-slim'
 Bundle 'tpope/vim-commentary'
 Bundle 'mattn/webapi-vim'
-Bundle 'Lokaltog/powerline'
-"Bundle 'wgibbs/vim-irblack'
+Bundle 'Lokaltog/vim-powerline'
 Bundle 'Valloric/YouCompleteMe'
+Bundle 'groenewege/vim-less'
 Bundle 'vim-scripts/vim-stylus'
 Bundle 'airblade/vim-gitgutter'
-Bundle 'ap/vim-css-color'
 Bundle 'mileszs/ack.vim'
 Bundle 'nathanaelkane/vim-indent-guides'
 Bundle 'digitaltoad/vim-jade'
@@ -49,7 +45,7 @@ set wrap
 set formatoptions=qrn1
 
 " No folding
-set nofoldenable
+" set nofoldenable
 
 " Show invisble chars
 set list
@@ -88,18 +84,30 @@ set wildignore+=*/.git/*,*/.hg/*,*/.svn/*
 let g:ycm_key_list_select_completion =  ['<C-TAB>', '<Down>']
 
 
-" NERDTree configuration
-let NERDTreeIgnore=['\.pyc$', '\.rbc$', '\~$']
-map <Leader>n :NERDTreeToggle<CR>
-autocmd VimEnter * NERDTree
-autocmd VimEnter * wincmd p
+" Fold defaults
+set foldmethod=syntax
+set foldlevelstart=1
+set foldnestmax=2
+
+" Code folding based on indent for CoffeeScript
+au BufNewFile,BufReadPost *.coffee set foldmethod=indent
+" Unfold one level
+au BufNewFile,BufReadPost *.coffee normal zMzr
+
+" Code folding based on burly braces for JavaScript
+au BufNewFile,BufReadPost *.js syntax region foldBraces start=/function/ end=/}/ transparent fold keepend extend
+au BufNewFile,BufReadPost *.js set foldmethod=syntax
+" au BufNewFile,BufReadPost *.js set foldlevel=99
+
+" Yaml Configuration
+au BufRead,BufNewFile *.{yml,yaml} set foldmethod=indent
+
 
 " Remember last location in file
 if has("autocmd")
   au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$")
     \| exe "normal g'\"" | endif
 endif
-
 
 " Thorfile, Rakefile, Vagrantfile and Gemfile are Ruby
 au BufRead,BufNewFile {Gemfile,Rakefile,Vagrantfile,Thorfile,config.ru,Guardfile}    set ft=ruby
@@ -114,8 +122,6 @@ au BufRead,BufNewFile *.txt call s:setupWrapping()
 " Mustache configuration
 au BufNewFile,BufRead *.mustache        setf mustache
 
-" Yaml Configuration
-au BufRead,BufNewFile *.{yml,yaml} set foldmethod=indent
 
 " make Python follow PEP8 ( http://www.python.org/dev/peps/pep-0008/ )
 au FileType python set softtabstop=4 tabstop=4 shiftwidth=4 textwidth=79
@@ -165,8 +171,6 @@ autocmd User Rails Rnavcommand fabricator spec/fabricators -suffix=_fabricator.r
 
 " Autocomplete Fabricator gem
 autocmd User Rails Rnavcommand decorator app/decorators -suffix=_decorator.rb -default=model()
-
-set foldmethod=syntax
 
 let Tlist_Auto_Update = 'true'
 let Tlist_Ctags_Cmd = '/usr/local/bin/ctags'
@@ -330,43 +334,37 @@ set hidden
 set sessionoptions=blank,curdir,folds,help,resize,tabpages,winsize
 map <leader>ss :mksession! ~/.vim/.session<cr>
 map <leader>sr :source ~/.vim/.session<cr>
-
 " Don't have YouCompleteMe ignore any files
 " (especially not Markdown!)
-"let g:ycm_filetypes_to_completely_ignore = {}
-"let g:ycm_complete_in_comments_and_strings = 1
-"let g:ycm_collect_identifiers_from_comments_and_strings = 1
-
+let g:ycm_filetypes_to_completely_ignore = {}
+let g:ycm_complete_in_comments_and_strings = 1
+let g:ycm_collect_identifiers_from_comments_and_strings = 1
 " UltiSnips completion function that tries to expand a snippet. If there's no
 " snippet for expanding, it checks for completion window and if it's
 " shown, selects first element. If there's no completion window it tries to
 " jump to next placeholder. If there's no placeholder it just returns TAB key 
 function! g:UltiSnips_Complete()
-    call UltiSnips_ExpandSnippet()
-    if g:ulti_expand_res == 0
-        if pumvisible()
-            return "\<C-n>"
-        else
-            call UltiSnips_JumpForwards()
-            if g:ulti_jump_forwards_res == 0
-               return "\<TAB>"
-            endif
-        endif
+  call UltiSnips_ExpandSnippet()
+  if g:ulti_expand_res == 0
+    call UltiSnips_JumpForwards()
+    if g:ulti_jump_forwards_res == 0
+      if pumvisible()
+        return "\<C-n>"
+      else
+        return "\<TAB>"
+      endif
     endif
-    return ""
+  endif
+  return ""
 endfunction
-"exec "inoremap <silent> " . g:UltiSnipsExpandTrigger . " <C-R>=g:UltiSnips_Complete()<cr>"
+let g:UltiSnipsExpandTrigger = "<Tab>"
+exec "inoremap <silent> " . g:UltiSnipsExpandTrigger . " <C-R>=g:UltiSnips_Complete()<cr>"
 
 let g:ackprg = 'ag --nogroup --nocolor --column'
 let g:ctrlp_clear_cache_on_exit=0
-
 " Have CtrlP use Vim's cwd not it's smarty pants stuff.
 let g:ctrlp_working_path_mode=0
 
-" Code folding based on indent for CoffeeScript
-au BufNewFile,BufReadPost *.coffee set foldmethod=indent
-" Unfold one level
-au BufNewFile,BufReadPost *.coffee normal zMzr
 
 " Windows
 set guioptions-=T
