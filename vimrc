@@ -44,9 +44,6 @@ color ir_black2
 set wrap
 set formatoptions=qrn1
 
-" No folding
-" set nofoldenable
-
 " Show invisble chars
 set list
 set listchars=tab:▸\ ,eol:¬
@@ -99,9 +96,14 @@ au BufNewFile,BufReadPost *.js syntax region foldBraces start=/function/ end=/}/
 au BufNewFile,BufReadPost *.js set foldmethod=syntax
 " au BufNewFile,BufReadPost *.js set foldlevel=99
 
+" Code folding based on indent for CoffeeScript
+au BufNewFile,BufReadPost *.html set foldmethod=indent
+au BufNewFile,BufReadPost *.html set foldlevel=2
+au BufNewFile,BufReadPost *.html set foldnestmax=4
+
+
 " Yaml Configuration
 au BufRead,BufNewFile *.{yml,yaml} set foldmethod=indent
-
 
 " Remember last location in file
 if has("autocmd")
