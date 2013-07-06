@@ -37,8 +37,19 @@ Bundle 'digitaltoad/vim-jade'
 
 " ************************************
 
+set nowritebackup
 
 color ir_black2
+
+" Line numbers toggle
+function! NumberToggle()
+  if(&relativenumber == 1)
+    set number
+  else
+    set relativenumber
+  endif
+endfunc
+nnoremap <C-n> :call NumberToggle()<cr>
 
 " Sensible long lines
 set wrap
@@ -82,24 +93,24 @@ let g:ycm_key_list_select_completion =  ['<C-TAB>', '<Down>']
 
 
 " Fold defaults
-set foldmethod=syntax
-set foldlevelstart=1
-set foldnestmax=2
-
-" Code folding based on indent for CoffeeScript
-au BufNewFile,BufReadPost *.coffee set foldmethod=indent
-" Unfold one level
-au BufNewFile,BufReadPost *.coffee normal zMzr
-
-" Code folding based on burly braces for JavaScript
-au BufNewFile,BufReadPost *.js syntax region foldBraces start=/function/ end=/}/ transparent fold keepend extend
-au BufNewFile,BufReadPost *.js set foldmethod=syntax
-" au BufNewFile,BufReadPost *.js set foldlevel=99
-
-" Code folding based on indent for CoffeeScript
-au BufNewFile,BufReadPost *.html set foldmethod=indent
-au BufNewFile,BufReadPost *.html set foldlevel=2
-au BufNewFile,BufReadPost *.html set foldnestmax=4
+"set foldmethod=syntax
+"set foldlevelstart=1
+"set foldnestmax=2
+"
+"" Code folding based on indent for CoffeeScript
+"au BufNewFile,BufReadPost *.coffee set foldmethod=indent
+"" Unfold one level
+"au BufNewFile,BufReadPost *.coffee normal zMzr
+"
+"" Code folding based on burly braces for JavaScript
+"au BufNewFile,BufReadPost *.js syntax region foldBraces start=/function/ end=/}/ transparent fold keepend extend
+"au BufNewFile,BufReadPost *.js set foldmethod=syntax
+"" au BufNewFile,BufReadPost *.js set foldlevel=99
+"
+"" Code folding based on indent for CoffeeScript
+"au BufNewFile,BufReadPost *.html set foldmethod=indent
+"au BufNewFile,BufReadPost *.html set foldlevel=2
+"au BufNewFile,BufReadPost *.html set foldnestmax=4
 
 
 " Yaml Configuration
@@ -136,9 +147,12 @@ filetype plugin indent on
 
 " Only match whitespace when not in insert mode
 match ExtraWhitespace /\s\+$/
+match DebugCommands "console"
 autocmd BufWinEnter * match ExtraWhitespace /\s\+$/
+autocmd BufWinEnter * match DebugCommands "console"
 autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
 autocmd InsertLeave * match ExtraWhitespace /\s\+$/
+autocmd InsertLeave * match DebugCommands "console"
 autocmd BufWinLeave * call clearmatches()
 
 if has("mac")
